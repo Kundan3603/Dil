@@ -3,11 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Animation</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Our 9 Months</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lilita+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0005; /* Dark elegant background */
+            --heart-color: #ff3366;
+            --text-gold: #ffd700;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        #canvas-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            color: white;
+            font-family: 'Lilita One', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--heart-color);
+        }
+
+        .heart {
+            font-size: 100px;
+            color: var(--heart-color);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            animation: heartbeat 1.2s infinite; /* Pulsing effect */
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.3); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+            60% { transform: scale(1); }
+        }
+
+        .milestone-text {
+            color: var(--text-gold);
+            font-size: 1.5rem;
+            margin-top: 20px;
+            min-height: 50px;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .instruction {
+            color: rgba(255, 255, 255, 0.5);
+            font-family: sans-serif;
+            font-size: 0.8rem;
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
-    <canvas id="birthdayCanvas"></canvas>
-    <script src="script.js"></script>
+
+    <canvas id="canvas-bg"></canvas>
+
+    <div class="container">
+        <h1>Happy 9 Months</h1>
+        <div class="heart" id="mainHeart">❤️</div>
+        <div class="milestone-text" id="message">Click the heart to see our 9 months...</div>
+        <p class="instruction">Tap the heart for each month</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        const mainHeart = document.getElementById('mainHeart');
+        const messageDisplay = document.getElementById('message');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const milestones = [
+            "Month 1: The start of something beautiful.",
+            "Month 2: Falling for your smile every day.",
+            "Month 3: Three months of pure happiness.",
+            "Month 4: My favorite person in the world.",
+            "Month 5: Every moment with you is a gift.",
+            "Month 6: Half a year together! I love you.",
+            "Month 7: Building my favorite memories with you.",
+            "Month 8: Thank you for being my rock.",
+            "Month 9: Today, tomorrow, and forever. ❤️"
+        ];
+
+        let currentMonth = 0;
+
+        // Interactive Milestone System
+        mainHeart.addEventListener('click', () => {
+            if (currentMonth < milestones.length) {
+                // Change text with a fade animation
+                gsap.to(messageDisplay, {
+                    opacity: 0,
+                    y: -10,
+                    duration: 0.3,
+                    onComplete: () => {
+                        messageDisplay.innerText = milestones[currentMonth];
+                        currentMonth++;
+                        gsap.to(messageDisplay, { opacity: 1, y: 0, duration: 0.3 });
+                    }
+                });
+
+                // Spawn floating mini-hearts
+                spawnHearts();
+            } else {
+                currentMonth = 0; // Reset
+                messageDisplay.innerText = "Click to start again...";
+            }
+        });
+
+        // Floating Heart Particles
+        const particles = [];
+        class HeartParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.size = Math.random() * 15 + 10;
+                this.speed = Math.random() * 2 + 1;
+                this.opacity = 1;
+            }
+            update() {
+                this.y -= this.speed;
+                this.opacity -= 0.005;
+            }
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = "#ff3366";
+                ctx.font = `${this.size}px serif`;
+                ctx.fillText("❤️", this.x, this.y);
+            }
+        }
+
+        function spawnHearts() {
+            for (let i = 0; i < 10; i++) {
+                particles.push(new HeartParticle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].opacity <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
 </body>
 </html>
